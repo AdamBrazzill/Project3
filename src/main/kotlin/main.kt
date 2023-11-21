@@ -1,4 +1,5 @@
 import controllers.NoteAPI
+import models.Item
 import models.Note
 import utils.ScannerInput.readNextInt
 import utils.ScannerInput.readNextLine
@@ -16,8 +17,8 @@ fun runMenu() {
             3 -> updateNote()
             4 -> deleteNote()
             5 -> archiveNote()
-            //6 -> addItemToNote()
-            //7 -> updateItemContentsInNote()
+            6 -> addItemNote()
+            7 -> updateItemContentsInNote()
             //8 -> deleteAnItem()
             //9 -> markItemStatus()
             10 -> searchNotes()
@@ -213,3 +214,44 @@ private fun askUserToChooseActiveNote(): Note? {
     }
     return null //selected note is not active
 }
+
+private fun addItemNote(){
+    val  note: Note? = askUserToChooseActiveNote()
+    if (note != null){
+        if (note.addItem(Item(itemContents = readNextLine("\t Item Contents: "))))
+            println("Add Successful")
+        else println("Add NOT Successful")
+    }
+}
+
+fun updateItemContentsInNote() {
+    val note: Note? = askUserToChooseActiveNote()
+    if (note != null) {
+        val item: Item? = askUserToChooseItem(note)
+        if (item != null) {
+            val newContents = readNextLine("Enter new contents: ")
+
+            // Directly use the item's itemID property
+            if (note.update(item.itemID, Item(item.itemID, newContents, item.isItemComplete))) {
+                println("Item contents updated")
+            } else {
+                println("Item contents not updated")
+            }
+        } else {
+            println("Invalid item chosen")
+        }
+    } else {
+        println("Invalid note chosen")
+    }
+}
+    private fun askUserToChooseItem(note: Note): Item? {
+        if (note.numberOfItems() > 0) {
+            println(note.listItems())
+            return note.findOne(readNextInt("\nEnter the id of the item: "))
+        } else {
+            println("No Items for chosen note")
+            return null
+        }
+    }
+
+

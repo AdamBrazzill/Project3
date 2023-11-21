@@ -1,6 +1,7 @@
 import controllers.NoteAPI
 import models.Item
 import models.Note
+import utils.ScannerInput.readNextChar
 import utils.ScannerInput.readNextInt
 import utils.ScannerInput.readNextLine
 import kotlin.system.exitProcess
@@ -19,11 +20,11 @@ fun runMenu() {
             5 -> archiveNote()
             6 -> addItemNote()
             7 -> updateItemContentsInNote()
-            //8 -> deleteAnItem()
-            //9 -> markItemStatus()
+            8 -> deleteAnItem()
+            9 -> markItemStatus()
             10 -> searchNotes()
-            //15 -> searchItems()
-            //16 -> listToDoItems()
+            15 -> searchItems()
+            16 -> listToDoItems()
             0 -> exitApp()
             else -> println("Invalid menu choice: $option")
         }
@@ -253,5 +254,62 @@ fun updateItemContentsInNote() {
             return null
         }
     }
+
+    fun deleteAnItem(){
+        val note: Note? = askUserToChooseActiveNote()
+        if (note != null){
+            val item: Item? = askUserToChooseItem(note)
+            if (item != null){
+                val isDeleted = note.delete(item.itemID)
+                if (isDeleted){
+                    println("Delete successful")
+
+                }else {
+                    println("Delete not successful")
+                }
+            }
+        }
+    }
+
+
+    fun markItemStatus(){
+        val note: Note? = askUserToChooseActiveNote()
+        if (note != null) {
+            val item: Item? = askUserToChooseItem(note)
+            if (item != null){
+                var changeStatus = 'X'
+                if (item.isItemComplete){
+                    changeStatus = readNextChar("The item is currently complete.. do you want to mark it as TODO?" )
+                    if ((changeStatus == 'Y') || (changeStatus == 'Y'))
+                        item.isItemComplete = false
+                }
+                else {
+                    changeStatus = readNextChar("The item is currently TODO.. do you want to mark it as complete?")
+                    if ((changeStatus == 'Y') ||  (changeStatus == 'y'))
+                        item.isItemComplete = true
+                }
+                }
+            }
+        }
+
+        fun searchItems() {
+            val searchContents = readNextLine("Enter the item contents to search by: ")
+            val searchResults = noteAPI.searchItemByContents(searchContents)
+            if (searchResults.isEmpty()) {
+                println("No items found")
+            } else {
+                (searchResults)
+            }
+
+        }
+
+        fun listToDoItems(){
+            if(noteAPI.numberOfToDoItems() > 0){
+                println("Total TODO items: ${noteAPI.numberOfToDoItems()}")
+            }
+            println(noteAPI.listTodoItems())
+        }
+
+
 
 
